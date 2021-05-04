@@ -69,6 +69,19 @@ The graphic above has a violin plot with a small boxplot on top.  This gives us 
 
 # Bivariate graphics
 
+```{r}
+#creating proportion of violent crimes column
+d <- mutate(d, crime_rate = (violent_crime/population)*100000)
+#proportion of youth in poverty vs crime rate
+ggplot(d, aes(y = youth_pov_prop_est, x = crime_rate)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE)+
+  labs(title = "Percentage of youth in poverty vs Violent Crime Rate") +
+  ylab("Percentage of Youth in Poverty") + 
+  xlab("Violent Crimes per 100,000 People")
+```
+This is a scatter plot of the percentage of youth in poverty vs violent crimes per 100,000 people.  The trend line shows a positive linear relationship which indicates that as one rate rises, so does the other.  The slope of the line is less than one indicating the violent crime rate increases at a faster rate than the percentage of youth in poverty does.  The data points fall near the line so the relationship likely exists, however, there is still a fair amount of variance indicating this may not be the strongest relationship.
+
 Provide bivariate graphical summaries of the response versus at least 3 other variables along with a brief interpretation of each graphic.
 
 * state map showing youth poverty rates (chris)
