@@ -5,6 +5,13 @@ author: "Student 1, Student 2, ..."
 output: html_document
 ---
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+#read the data from github
+library(readr)
+
+d2p1 <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/d2p1.csv"))
+```
+
 # Introduction
 
 Relevance, question of interest, background, etc.
@@ -57,5 +64,3 @@ In conclusion, although Colorado ranks well in statewide youth poverty rate comp
 # Appendix
 
 The code you used to clean and analyze your data
-
-This is a test 22222
