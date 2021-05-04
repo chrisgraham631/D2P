@@ -25,7 +25,7 @@ We collected data from various federal, state, and non-profit agencies such as H
 
 Using exploratory data analysis, we determined which variables had a linear relationship with youth poverty. We further narrowed down the variables by using linear regression analysis to determine which of the 50 variables were the most influential in predicting youth poverty rates in our multiple regression model. 
 
-We tested our model assumptions of homoscedasticity, linearity, normality, no multicollinearity, and no autocorrelation using a combination of formal testing and visual inspection of scatter plots. For example, We use the Durbin-Watson test to confirm that there were no autocorrelation in the model. We removed any variables with a variance inflation factor (VIF) greater than 5 to minimize any multicollinearity in the model. We also remove any variables with a p-value great greater than.05. This produced a model with 3 explanatory variables, prop_health_insurance, percent_latino_youth_pov, and percent_black_youth_pov.
+We tested our model assumptions of homoscedasticity, linearity, normality, no multicollinearity, and no autocorrelation using a combination of formal testing and visual inspection of scatter plots. For example, We use the Durbin-Watson test to confirm that there were no autocorrelation in the model. We removed any variables with a variance inflation factor (VIF) greater than 5 to minimize any multicollinearity in the model. We also remove any variables with a p-value great greater than.05. This produced a model with 3 explanatory variables, prop_health_insurance, percent_latino_youth_pov, and percent_black_youth_pov. 
 
 # Data cleaning
 
