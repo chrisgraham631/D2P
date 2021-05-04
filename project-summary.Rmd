@@ -6,10 +6,13 @@ output: html_document
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-#read the data from github
+#read the data from github and pull in libraries
+
+library(ggplot2)
 library(readr)
 
 d2p1 <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/d2p1.csv"))
+food <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/foodaccess3.csv"))
 ```
 
 # Introduction
@@ -18,9 +21,7 @@ Relevance, question of interest, background, etc.
 
 # Data cleaning
 
-The data cleaning process never really ended.  Initially everyone collected relevant data and a large data table was created with most of the variables we used.  As the analysis continued, we had to add a few additional variables.  The main dataset used broke down the data by state, but additional data was analyzed at the both the national level and the Colorado county level.  
-
-The initial data cleaning required using many techniques learned in the Module 4 and a few that were found on the internet.  Common functions like select, filter and rename were used frequently.  The mutate function was used multiple times.  Mostly it was used to create either a proportion of a variable from a total population or to create a population estimate based on a proportion.  One of the datasets had the individual states broken down by something called a CoC number.  This required us to the separate function to separate the state abbreviation from the CoC number.  This left us with multiple rows for each state and a few extra rows with numeric data.  After doing some digging, we found the aggregate function, which allowed us to combine the various rows for each state by summing the numeric data.  Once the various data tables were clean and named correctly, the merge function was used to combine the data into one table.  It was then written as a .csv.
+Describe what you had to do to clean the data. E.g., importing multiple data sets, merging them together, pivoting data frames, filtering the data, converting data types, etc. Include this code AS AN APPENDIX.
 
 # Numeric summaries
 
@@ -33,6 +34,10 @@ Provide a numeric summary of the response and at least 3 other variables along w
 Provide graphical summaries of the response and at least 3 other variables along with a brief interpretation of each graphic.
 
 Response:
+```{r}
+ggplot(d2p1, aes(x=youth_pov_prop_est)) + geom_histogram()
+```
+
 * histogram of youth poverty and show where colorado falls (Chris)
 
 Predictors:
