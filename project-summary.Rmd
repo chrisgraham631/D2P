@@ -83,6 +83,14 @@ Provide at least 3 multivariate graphical summaries along with a brief interpret
 * scatter plot showing health insurance vs. youth poverty vs. states
 * **find another** (chris)
 
+```{r, fig.width = 12, fig.height = 2}
+ggplot(eth, aes(fill = Ethnicity, x = Type, y = Proportion)) + 
+  geom_bar(position = "stack", stat = "identity") +
+  labs(title = "Youth Population and Youth Population in Poverty by Ethnicity") +
+  coord_flip()
+```
+The graphic above shows the ethnic breakdown of the total population of children in the United States of America and the ethnic breakdown of children who live in poverty in the USA.  If ethnicity had no effect on children living in poverty, then we would expect each ethnic group to have the same representation in both bars.  While the graphic does not allow for quantitative analysis, it does show whether youth in certain ethnic groups are more or less likely to be exposed to poverty.  The bar representing the 'Non-Hispanic White' group represents a significantly bigger portion of the total childhood population than it does the population of children in poverty which indicates that children in the 'Non-Hispanic White' ethnic group are less likely to be exposed to poverty.  Children in the 'Asian and Pacific Islander' group are less likely to be exposed to poverty by the same observation.  This graphic also shows that children in the 'Hispanic or Latino', 'Black or African American' and 'American Indian' ethnic groups are more likely to be exposed to poverty because they represent a larger portion of the population of children in poverty than the total population of children.
+
 # Conclusions and recommendations
 
 What are your overall conclusions about the relationship between your response variable and your other variables? Based on this information, what policy recommendations would you propose to address your findings?
