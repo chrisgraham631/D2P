@@ -41,6 +41,18 @@ ggplot(d2p1, aes(x=youth_pov_prop_est)) + geom_histogram()
 * histogram of youth poverty and show where colorado falls (Chris)
 
 Predictors:
+
+```{r}
+#I wanted the violin plot of the entire United States but this plot was requiring a y aesthetic.  CPI is the same for all 50 states so it was chosen for the y aesthetic.
+ggplot(d2p1) + geom_violin(aes(x = prop_latino_youth_pov, y = cpi)) + geom_boxplot(aes(x = prop_latino_youth_pov, y = cpi), width = 0.1) + xlab("x") + ylab("y") + labs(title = "Proportion of Latino youth living in poverty")
+```
+The graphic above has a violin plot with a small boxplot on top.  This gives us information about the distribution of the data.  The boxplot shows the Q1, median and Q3 values, while the violin plot shows the density of the data.  The violin plot would also show if the data is multimodal.  It appears as if the mode is around 0.24 but a small second mode may be around 0.34.  From this we can see that 50% of states have less than 25.5% of their Latino youth population in poverty and 75% of the states have less than 33% of their Latino youth population living in poverty.  It also shows a maximum value of 40% of Latino youth living in poverty and a minimum value of around 11%.
+
+
+```{r}
+ggplot(d2p1) + geom_violin(aes(x = prop_black_youth_pov, y = cpi)) + geom_boxplot(aes(x = prop_black_youth_pov, y = cpi), width = 0.1) + xlab("x") + ylab("y") + labs(title = "Proportion of Black youth living in poverty")
+```
+The graphic above has a violin plot with a small boxplot on top.  This gives us information about the distribution of the data.  The boxplot shows the Q1, median and Q3 values, while the violin plot shows the density of the data.  The violin plot would also show if the data is multimodal.  The mode of this dataset appears to be around 0.38 with a potential smaller second mode around 0.27.  The boxplot shows that 25% of states have less than 27% of their black youth population living in poverty while 50% of states have less than 35% of their black youth living in poverty.  For this plot the maximum percentage of black youth living in poverty is around 47% and the minimum is around 17%.  The state with the lowest proportion of black youth living in poverty is still at nearly 20%, thats way too high.
 * box plot health insurance
 * violin of:
   * latino
