@@ -1,13 +1,13 @@
-﻿Type,Ethnicity,Proportion,,,,,,,,,,,
-Total,American Indian,0.008502848,,,,,,,,,,,
-Total,Asian and Pacific Islander,0.051633867,,,,,,,,,,,
-Total,Black or African American,0.137375735,,,,,,,,,,,
-Total,Hispanic or Latino,0.251777236,,,,,,,,,,,
-Total,Non-Hispanic White,0.508113355,,,,,,,,,,,
-Total,Other,0.042596959,,,,,,,,,,,
-In_pov,American Indian,0.017374373,,,,,,,,,,,
-In_pov,Asian and Pacific Islander,0.031678275,,,,,,,,,,,
-In_pov,Black or African American,0.250580394,,,,,,,,,,,
-In_pov,Hispanic or Latino,0.360293567,,,,,,,,,,,
-In_pov,Non-Hispanic White,0.304276193,,,,,,,,,,,
-In_pov,Other,0.035797199,,,,,,,,,,,
+﻿Type,Ethnicity,Proportion
+Total,American Indian,0.008502848
+Total,Asian and Pacific Islander,0.051633867
+Total,Black or African American,0.137375735
+Total,Hispanic or Latino,0.251777236
+Total,Non-Hispanic White,0.508113355
+Total,Other,0.042596959
+In_pov,American Indian,0.017374373
+In_pov,Asian and Pacific Islander,0.031678275
+In_pov,Black or African American,0.250580394
+In_pov,Hispanic or Latino,0.360293567
+In_pov,Non-Hispanic White,0.304276193
+In_pov,Other,0.035797199
