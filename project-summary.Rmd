@@ -71,7 +71,7 @@ The graphic above has a violin plot with a small boxplot on top.  This gives us 
 
 ```{r}
 #creating proportion of violent crimes column
-d <- mutate(d, crime_rate = (violent_crime/population)*100000)
+d <- mutate(d2p1, crime_rate = (violent_crime/population)*100000)
 #proportion of youth in poverty vs crime rate
 ggplot(d, aes(y = youth_pov_prop_est, x = crime_rate)) + 
   geom_point() +
