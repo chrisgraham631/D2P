@@ -1,7 +1,7 @@
 ---
 title: "Project Summary"
-subtitle: "Project name"
-author: "Student 1, Student 2, ..."
+subtitle: "Holistic Approach to Understanding and Combating Child Poverty in Colorado"
+author: "Bai Jaitrong, Christopher Graham, David Palcsak"
 output: html_document
 ---
 
