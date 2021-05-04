@@ -17,7 +17,15 @@ food <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/
 
 # Introduction
 
-Relevance, question of interest, background, etc.
+In 2017 the United States ranked 6th in GDP per capita among the 36 countries in The Organization for Economic Co-operation and Development (OECD).  In that same year the United States had the third highest proportion of youth in poverty. Children raised in poverty are more likely to live in poverty in their adult lives, and raise any children they have in poverty, thus continuing the “Cycle of Poverty”.
+
+Our objective was to explore what socioeconomic factors have an effect on childhood poverty in the United States and suggest policy changes that can be made in Colorado to help reduce our state's poverty rate and break the cycle?
+
+We collected data from various federal, state, and non-profit agencies such as HUD and the Annie E. Casey Foundation’s website *The Kids Count Data Center*. Our final data set consisted of 51 observations and 50 variables related to poverty, unemployment, health insurance coverage, education, crime rate, food access, and ethnicity for each of the states and DC.
+
+Using exploratory data analysis, we determined which variables had a linear relationship with youth poverty. We further narrowed down the variables by using linear regression analysis to determine which of the 50 variables were the most influential in predicting youth poverty rates in our multiple regression model. 
+
+We tested our model assumptions of homoscedasticity, linearity, normality, no multicollinearity, and no autocorrelation using a combination of formal testing and visual inspection of scatter plots. For example, We use the Durbin-Watson test to confirm that there were no autocorrelation in the model. We removed any variables with a variance inflation factor (VIF) greater than 5 to minimize any multicollinearity in the model. We also remove any variables with a p-value great greater than.05. This produced a model with 3 explanatory variables, prop_health_insurance, percent_latino_youth_pov, and percent_black_youth_pov.
 
 # Data cleaning
 
