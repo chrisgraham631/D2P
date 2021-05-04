@@ -99,4 +99,138 @@ Based on our analysis, our policy recommendation is two-fold.  First, Government
 
 # Appendix
 
-The code you used to clean and analyze your data
+This is from the initial data cleanup.  This was done in many pieces to ensure the process was going as expected and to allow the other group members to follow the process step by step.
+
+```{r, eval = FALSE}
+#loading in the dataset
+var_data <- read_csv("C:/Users/dpalc/OneDrive/Documents/School/DataWrangling/D2P_project/05b_analysis_file_update.csv")
+dim(var_data)
+```
+
+
+```{r, eval = FALSE}
+#selecting relevant columns
+var_data <- select(var_data, year, cocnumber, dem_pop_pop_census, dem_soc_ed_bach_acs5yr, dem_soc_ed_hsgrad_acs5yr, dem_soc_ed_lesshs_acs5yr, econ_labor_medinc_acs5yr, econ_labor_unemp_rate_BLS, cpi_2017, dem_health_ins_acs5yr, dem_soc_white_census, dem_soc_black_census, dem_soc_native_census, dem_soc_asian_census, dem_soc_pacific_census, dem_soc_hispanic_census)
+```
+
+
+```{r, eval = FALSE}
+#removing data from other years
+var_data <- filter(var_data, year == "2017")
+```
+
+
+```{r, eval = FALSE}
+#selecting columns without the year
+var_data <- select(var_data, cocnumber, dem_pop_pop_census, dem_soc_ed_bach_acs5yr, dem_soc_ed_hsgrad_acs5yr, dem_soc_ed_lesshs_acs5yr, econ_labor_medinc_acs5yr, econ_labor_unemp_rate_BLS, cpi_2017, dem_health_ins_acs5yr, dem_soc_white_census, dem_soc_black_census, dem_soc_native_census, dem_soc_asian_census, dem_soc_pacific_census, dem_soc_hispanic_census)
+```
+
+
+```{r, eval = FALSE}
+#renaming columns
+var_data <- rename(var_data, total_pop = dem_pop_pop_census, educ_bach = dem_soc_ed_bach_acs5yr, educ_hs = dem_soc_ed_hsgrad_acs5yr, educ_lesshs = dem_soc_ed_lesshs_acs5yr, med_income = econ_labor_medinc_acs5yr, unemployment = econ_labor_unemp_rate_BLS, cpi = cpi_2017, health_insurance = dem_health_ins_acs5yr, ethinicity_white = dem_soc_white_census, ethnicity_black = dem_soc_black_census, ethnicity_native = dem_soc_native_census, ethnicity_asian = dem_soc_asian_census, ethnicity_pacific = dem_soc_pacific_census, ethnicity_hispanic = dem_soc_hispanic_census)
+```
+
+The data we have is separated by state and CoC number.  We need to strip the CoC number from the state abbreviation, then combine each state's data into a single row.
+
+```{r, eval = FALSE}
+#isolating data in proportions
+prop_data <- select(var_data, cocnumber, total_pop, educ_bach, educ_hs, educ_lesshs, unemployment, health_insurance)
+```
+
+```{r, eval = FALSE}
+#changing proportion columns into total number
+prop_data <- mutate(prop_data, educ_bach = total_pop*educ_bach)
+```
+
+```{r, eval = FALSE}
+#changing all proportion columns into total number
+prop_data <- mutate(prop_data, educ_hs = total_pop*educ_hs, educ_lesshs = total_pop*educ_lesshs, unemployment = total_pop*(unemployment/100), health_insurance = total_pop*health_insurance)
+```
+
+```{r, eval = FALSE}
+#separating state code from CoC number
+prop_data <- separate(prop_data, col = cocnumber, into = c("State_abb", "Coc_num"), sep = "-")
+```
+
+```{r, eval = FALSE}
+#removing CoC number from dataset
+prop_data <- select(prop_data, !Coc_num)
+```
+
+```{r, eval = FALSE}
+#turning tibble into data table
+prop_table <- data.table(prop_data)
+```
+
+```{r, eval = FALSE}
+#combining rows by sum
+prop_table <- aggregate(. ~State_abb, data = prop_table, sum)
+```
+
+```{r, eval = FALSE}
+#writing to a file because I needed help from Chris
+write.csv(prop_data, "C:/Users/dpalc/OneDrive/Documents/School/DataWrangling/D2P_project/data_to_add.csv")
+```
+
+```{r, eval = FALSE}
+#separating columns that need to be averaged
+avg_data <- select(var_data, cocnumber, med_income, cpi)
+```
+
+```{r, eval = FALSE}
+#stripping the CoC number from the state abbreviation
+avg_data <- avg_data %>% separate(col = cocnumber, into = c("State_abb", "Coc_num"), sep = "-") %>% select(State_abb, med_income, cpi)
+```
+
+```{r, eval = FALSE}
+#combining rows by mean
+avg_data <- aggregate(. ~State_abb, data = avg_data, mean)
+```
+
+```{r, eval = FALSE}
+#isolating remaining columns to combine by row
+sum_data <- select(var_data, cocnumber, ethinicity_white, ethnicity_black, ethnicity_native, ethnicity_asian, ethnicity_pacific, ethnicity_hispanic)
+```
+
+```{r, eval = FALSE}
+#stripping the CoC number
+sum_data <- sum_data %>% separate(col = cocnumber, into = c("State_abb", "Coc_num"), sep = "-") %>% select(State_abb, ethinicity_white, ethnicity_black, ethnicity_native, ethnicity_asian, ethnicity_pacific, ethnicity_hispanic) 
+```
+
+```{r, eval = FALSE}
+#combining rows by sum
+sum_data <- aggregate(. ~State_abb, data = sum_data, sum)
+```
+
+```{r, eval = FALSE}
+#reforming var_data tibble
+var_data_2 <- merge(x = prop_table, y = sum_data, by = "State_abb")
+```
+
+```{r, eval = FALSE}
+#reforming var_data tibble continued
+var_data <- merge(x = var_data_2, y = avg_data, by = "State_abb")
+```
+
+```{r, eval = FALSE}
+#loading in poverty data, note: this was a basic dataset so I made some adjustments in excel before loading into R
+pov_data <- read_csv("C:/Users/dpalc/OneDrive/Documents/School/DataWrangling/D2P_project/poverty_by_age.csv")
+```
+
+```{r, eval = FALSE}
+#selecting relevant columns
+pov_data <- select(pov_data, !total_pop_est)
+```
+
+```{r, eval = FALSE}
+#merging the tibbles
+final_data <- merge(x = pov_data, y = var_data, by = "State_abb")
+```
+
+```{r, eval = FALSE}
+#writing the file
+write.csv(final_data, "C:/Users/dpalc/OneDrive/Documents/School/DataWrangling/D2P_project/D2P_poverty_dataset.csv")
+```
+
+**This is the end of the initial data cleanup**
