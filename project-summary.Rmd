@@ -108,7 +108,8 @@ theme_bw()
 The graphic above has a violin plot with a small boxplot on top.  This gives us information about the distribution of the data.  The boxplot shows the Q1, median and Q3 values, while the violin plot shows the density of the data.  The violin plot would also show if the data is multimodal.  The mode of this dataset appears to be around 0.38 with a potential smaller second mode around 0.27.  The boxplot shows that 25% of states have less than 27% of their black youth population living in poverty while 50% of states have less than 35% of their black youth living in poverty.  For this plot the maximum percentage of black youth living in poverty is around 47% and the minimum is around 17%.  The state with the lowest proportion of black youth living in poverty is still at nearly 20%, thats way too high.
 
 ```{r}
-ggplot(d2p1,aes(y= prop_health_insurance)) + geom_boxplot() + ylab("Percentage of Population With Health Insurance")
+ggplot(d2p1,aes(y= prop_health_insurance)) + geom_boxplot() + ylab("Percentage of Population With Health Insurance")+
+theme_bw() 
 ```
 
 The median is close to 90% of the population having health insurance coverage.  With the median being towards the top of the box plot, the data is left skewed. The minimum is close to 80% and the maximum is close to 96% and the spread looks to be low. There are also no outliers.
@@ -156,7 +157,8 @@ food <-  food %>%  mutate(perc_weighted_mean_lakids1share = weighted_mean_lakids
 ggplot(food,aes(x = perc_weighted_mean_lakids1share, y = youth_pov_rate)) + 
   geom_smooth(method = lm,se = FALSE) +
   xlab("Percentage of youth living in low food access areas") + 
-  ylab("2010 Youth Poverty Rate")
+  ylab("2010 Youth Poverty Rate") +
+    theme_bw()
 ```
 
 The scatter plot of the 2010 youth poverty rate vs percentage of youth living in low food access areas shows that there is a strong positive relationship between the two variables.  As the percentage of youth living in low food access areas increases, youth poverty rate increases. 
@@ -166,16 +168,18 @@ The scatter plot of the 2010 youth poverty rate vs percentage of youth living in
 Provide at least 3 multivariate graphical summaries along with a brief interpretation of each graphic.  This could be something like a scatter plot of the response versus another variable that facets by a third variable (or uses colors or shapes to distinguish levels of another variable).
 
 ```{r, warning= FALSE, comment= " "}
-ggplot(d2p1,aes(prop_health_insurance,youth_pov_prop_est)) + geom_point( aes(col=State_abb)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb)) + theme(legend.position = "none") + xlab("Percentage of the Population With Health Insurance") + ylab("Youth Poverty Rate")
+ggplot(d2p1,aes(prop_health_insurance,youth_pov_prop_est)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb)) + theme(legend.position = "none") + xlab("Percentage of the Population With Health Insurance") + ylab("Youth Poverty Rate") +
+    theme_bw()
 ```
 
 The above scatter plot indicates that the youth poverty rate decreases as the proportion of the population who has health insurance coverage increases.  It also shows that the colder climate states have a higher proportion of the population with health insurance coverage and with a lower youth poverty rate. 
 
 ```{r}
-
+ggplot(d2p1,aes(Studenteach*0.01, youth_pov_prop_est)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb, col = salary, size = salary)) + theme(legend.position = "none") + xlab("Student to Teacher Ratio") + ylab("Youth Poverty Rate") +
+    theme_bw() + scale_color_gradient(name = "Teacher Salary",low="red", high="blue") + scale_size_continuous( guide="none")
 ```
 
-stuff
+There is a positive linear relationship between the student to teacher ratio and youth poverty rates for States. As the number of students per teacher rises, so does the youth poverty rate. To add to that, with the exception of California, teachers with the most students make the least in annual income.
 
 ```{r, fig.width = 12, fig.height = 2}
 ggplot(eth, aes(fill = Ethnicity, x = Type, y = Proportion)) + 
@@ -352,5 +356,3 @@ final_data <- merge(x = pov_data, y = var_data, by = "State_abb")
 #writing the file
 write.csv(final_data, "C:/Users/dpalc/OneDrive/Documents/School/DataWrangling/D2P_project/D2P_poverty_dataset.csv")
 ```
-
-**This is the end of the initial data cleanup**
