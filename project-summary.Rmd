@@ -183,16 +183,12 @@ poverty_model2 <- lm(youth_pov_prop_est ~ prop_health_insurance + prop_latino_yo
 
 summary(poverty_model2)
 
-car::vif(poverty_model2)
-
-(mfrow=c(2,2))
-plot(poverty_model2)
-par(mfrow=c(1,1))
-
-#View(d2p1)
 
 ```
 
+The summary of the model confirms that all three explanatory variables are statistically significant with their p-values being under .05. The adjusted R-squared indicates that the model explains approximately 73% of the variability. The overall p-value, 1.1689e-08, for the model under the F-statistic confirms that it does a better job in predicting youth poverty than a model using just the average poverty rate. 
+
+Holding the other two variables constant, the coefficient for prop_health_insurance indicates that for a 1% increase in the proportion of the population who has health insurance coverage there is a decrease in youth poverty by .50%. In contrast, for a 1% increase in the Latino and black youth poverty rate there is an increase in the overall youth poverty rate by .29% and .16% respectively. 
 
 
 
