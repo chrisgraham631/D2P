@@ -179,7 +179,7 @@ The graphic above shows the ethnic breakdown of the total population of children
 ```{r, comment= "", echo=FALSE}
  
 
-poverty_model2 <- lm(youth_pov_prop_est ~ prop_health_insurance + percent_latino_youth_pov + percent_black_youth_pov, data= d2p1) 
+poverty_model2 <- lm(youth_pov_prop_est ~ prop_health_insurance + prop_latino_youth_pov + prop_black_youth_pov, data= d2p1) 
 
 summary(poverty_model2)
 
@@ -193,20 +193,9 @@ par(mfrow=c(1,1))
 
 ```
 
-# Homoscedasticy and Autocorrelation Test
-
-```{r}
-
-#testing for homoscedasticty/constant variance, null hypothesis is homoscedasticity. if p-value is less than .05, then the null hypothesis can be rejected.
-library(lmtest)
-bptest(poverty_model2)
-
-#testing for autocorrellation, null hypothesis is the errors( residuals are independent) are uncorrelated
-
-dwtest(poverty_model2)
 
 
-```
+
 
 
 # Conclusions and recommendations
