@@ -101,6 +101,13 @@ The graphic above has a violin plot with a small boxplot on top.  This gives us 
 
 * box plot health insurance
 
+```{r}
+
+ggplot(d2p1,aes(, y= prop_health_insurance)) + geom_boxplot() 
+
+
+```
+
 
 # Bivariate graphics
 
