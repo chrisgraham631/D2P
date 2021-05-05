@@ -47,9 +47,9 @@ Provide a numeric summary of the response and at least 3 other variables along w
 
 ```{r}
 
-summary(d2pbai$youth_pov_prop_est)
-sd(d2pbai$youth_pov_prop_est)
-sd(d2pbai$youth_pov_prop_est)/15.93
+summary(d2p1$youth_pov_prop_est)
+sd(d2p1$youth_pov_prop_est)
+sd(d2p1$youth_pov_prop_est)/15.93
 
 ```
 
@@ -58,9 +58,9 @@ The median and mean of the youth poverty  rate are 15.50% and 15.93% respectivel
 #Proportion of the population who has Health Insurance Coverage 
 ```{r}
 
-summary(d2pbai$prop_health_insurance)
-sd(d2pbai$prop_health_insurance)
-sd(d2pbai$prop_health_insurance)/89.17
+summary(d2p1$prop_health_insurance)
+sd(d2p1$prop_health_insurance)
+sd(d2p1$prop_health_insurance)/89.17
 
 ```
 
@@ -147,7 +147,7 @@ Provide at least 3 multivariate graphical summaries along with a brief interpret
 
 ```{r, warning= False, comment= " "}
 
-ggplot(d2pbai,aes(prop_health_insurance,youth_pov_prop_est)) + geom_point( aes(col=State_abb)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb)) + theme(legend.position = "none")
+ggplot(d2p1,aes(prop_health_insurance,youth_pov_prop_est)) + geom_point( aes(col=State_abb)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb)) + theme(legend.position = "none")
 
 ```
 
