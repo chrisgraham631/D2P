@@ -336,4 +336,40 @@ final_data <- merge(x = pov_data, y = var_data, by = "State_abb")
 write.csv(final_data, "C:/Users/dpalc/OneDrive/Documents/School/DataWrangling/D2P_project/D2P_poverty_dataset.csv")
 ```
 
+
+```{r, comment= "", echo=FALSE, eval = FALSE}
+# used a modified version of forward and backward selection, instead of using the p value to remove the variables, used VIF value to determine what variable to remove
+
+# Assumption test:
+# linearity- view residuals vs Fitted, roughly linear base on scatter plot( red line roughly horizontal and no obvious pattern on the plot)
+# normality- view Q-Q plot, points roughly aligned with the diagonal line
+# no multicollinearity verified with Variance Inflation factor (VIF less than 5)), 
+# No autocorrelation confirmed with the Durbin Watson Test
+# homoscedasticity confirmed with bp ( Breusch - Pagan )test 
+
+summary(poverty_model2)
+
+car::vif(poverty_model2)
+
+#Residual scatter plots 
+
+(mfrow=c(2,2))
+plot(poverty_model2)
+par(mfrow=c(1,1))
+
+
+```
+
+```{r, eval = FALSE}
+#testing for homoscedasticty/constant variance, null hypothesis is homoscedasticity. if p-value is less than .05, then the null hypothesis can be rejected.
+library(lmtest)
+bptest(poverty_model2)
+
+#testing for autocorrellation, null hypothesis is the errors( residuals are independent) are uncorrelated
+
+dwtest(poverty_model2)
+
+
+```
+
 **This is the end of the initial data cleanup**
