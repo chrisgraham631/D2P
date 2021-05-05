@@ -108,6 +108,7 @@ ggplot(d2p1,aes(, y= prop_health_insurance)) + geom_boxplot()
 
 ```
 
+The median is close to 90% of the population having health insurance coverage. With the median being towards the top of the box plot, the data is left skewed. The minimum is close to 80% and the maximum is close to 96% and the spread looks to be low. There are also no outliers.
 
 # Bivariate graphics
 
@@ -171,6 +172,42 @@ ggplot(eth, aes(fill = Ethnicity, x = Type, y = Proportion)) +
 theme_bw() 
 ```
 The graphic above shows the ethnic breakdown of the total population of children in the United States of America and the ethnic breakdown of children who live in poverty in the USA.  If ethnicity had no effect on children living in poverty, then we would expect each ethnic group to have the same representation in both bars.  While the graphic does not allow for quantitative analysis, it does show whether youth in certain ethnic groups are more or less likely to be exposed to poverty.  The bar representing the 'Non-Hispanic White' group represents a significantly bigger portion of the total childhood population than it does the population of children in poverty which indicates that children in the 'Non-Hispanic White' ethnic group are less likely to be exposed to poverty.  Children in the 'Asian and Pacific Islander' group are less likely to be exposed to poverty by the same observation.  This graphic also shows that children in the 'Hispanic or Latino', 'Black or African American' and 'American Indian' ethnic groups are more likely to be exposed to poverty because they represent a larger portion of the population of children in poverty than the total population of children.
+
+
+# Mutiple Regression Model 
+
+```{r, comment= "", echo=FALSE}
+ 
+
+poverty_model2 <- lm(youth_pov_prop_est ~ prop_health_insurance + percent_latino_youth_pov + percent_black_youth_pov, data= d2p1) 
+
+summary(poverty_model2)
+
+car::vif(poverty_model2)
+
+(mfrow=c(2,2))
+plot(poverty_model2)
+par(mfrow=c(1,1))
+
+#View(d2p1)
+
+```
+
+# Homoscedasticy and Autocorrelation Test
+
+```{r}
+
+#testing for homoscedasticty/constant variance, null hypothesis is homoscedasticity. if p-value is less than .05, then the null hypothesis can be rejected.
+library(lmtest)
+bptest(poverty_model2)
+
+#testing for autocorrellation, null hypothesis is the errors( residuals are independent) are uncorrelated
+
+dwtest(poverty_model2)
+
+
+```
+
 
 # Conclusions and recommendations
 
