@@ -14,6 +14,11 @@ library(readr)
 d2p1 <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/d2p1.csv"))
 food <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/foodaccess3.csv"))
 eth <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/national_ethnicity_histogram_data.csv"))
+
+#data manipulation used by Bai, changing crime variable to crime rate per 100K
+
+d2pbai <- d2p1 %>% mutate(prop_health_insurance = health_insurance/total_pop*100, prop_educ_bach = educ_bach/total_pop*100, violent_crime_per_100K = violent_crime/population *100000, homicide_per_100K = homicide/population*100000, raped_revised_per_100K = rape_revised/population*100000, robbery_per_100K = robbery/population *100000, aggravated_assault_per_100K = aggravated_assault/population *100000, property_crime_per_100K = property_crime/population *100000, burgulary_per_100K = burglary/population *100000, larceny_per_100K = larceny/population*100000, motor_vehicle_theft_per_100K = motor_vehicle_theft/population *100000) %>% select(State_abb, youth_pov_prop_est,unemployment, prop_health_insurance,prop_educ_bach,elem_size,second_size,salary, prop_latino_youth_pov,prop_asian_youth_pov,prop_black_youth_pov, prop_american_indian_youth_pov, prop_white_youth_pov, prop_other_youth_pov,violent_crime_per_100K,homicide_per_100K,raped_revised_per_100K, robbery_per_100K,aggravated_assault_per_100K,property_crime_per_100K,burgulary_per_100K,larceny_per_100K,motor_vehicle_theft_per_100K)
+
 ```
 
 # Introduction
@@ -37,6 +42,29 @@ The initial data cleaning required using many techniques learned in the Module 4
 # Numeric summaries
 
 Provide a numeric summary of the response and at least 3 other variables along with a brief interpretation of each summary.
+
+#Youth Poverty Rate 
+
+```{r}
+
+summary(d2pbai$youth_pov_prop_est)
+sd(d2pbai$youth_pov_prop_est)
+sd(d2pbai$youth_pov_prop_est)/15.93
+
+```
+
+The median and mean of the youth poverty  rate are 15.50% and 15.93% respectively. The mean is larger than the median indicating that the data is skewed to the right. The lowest youth poverty rate is at 8.10% and the highest poverty rate is at 27.60 %. Based on the ratio of the standard deviation and mean being approximately 27%, the spread of the data would be considered low.
+
+#Proportion of the population who has Health Insurance Coverage 
+```{r}
+
+summary(d2pbai$prop_health_insurance)
+sd(d2pbai$prop_health_insurance)
+sd(d2pbai$prop_health_insurance)/89.17
+
+```
+
+The median and mean of the proportion of the population who has health insurance coverage is 89.45% and 89.17%. The mean is smaller than the median indicting that the data is skewed to the left. The lowest proportion of the population who has health insurance coverage is 80.75% and the highest is 96.75%. Based on the ratio of the standard deviation and mean being approximately 3.8%, the spread of the data would be considered low. 
 
 * summarize Latino and Black (Chris)
 
@@ -91,14 +119,41 @@ This is a scatter plot of the percentage of youth in poverty vs violent crimes p
 *Provide bivariate graphical summaries of the response versus at least 3 other variables along with a brief interpretation of each graphic.*
 
 * state map showing youth poverty rates (chris)
+
 * youth poverty vs food access scatter plot (Bai)
+
+```{r, echo=FALSE}
+
+food <-  food %>% %>% mutate(perc_weighted_mean_lakids1share = weighted_mean_lakids1share*100, youth_pov_rate = youth_poverty_rate_2010*100) 
+
+ggplot(food,aes(x = perc_weighted_mean_lakids1share, y = youth_pov_rate)) + 
+  geom_smooth(method = lm,se = FALSE) +
+  xlab("Percentage of youth living in low food access areas") + 
+  ylab("2010 Youth Poverty Rate")
+
+
+```
+
+The scatter plot of the 2010 youth poverty rate vs percentage of youth living in low food access areas shows that there is a strong positive relationship between the two variables. As the percentage of youth living in low food access areas increases, youth poverty rate increases. 
 
 # Multivariate graphics
 
 Provide at least 3 multivariate graphical summaries along with a brief interpretation of each graphic. This could be something like a scatter plot of the response versus another variable that facets by a third variable (or uses colors or shapes to distinguish levels of another variable).
 
 * bar chart showing ethnicity, total, and poverty.
-* scatter plot showing health insurance vs. youth poverty vs. states
+
+
+# scatter plot showing health insurance vs. youth poverty vs. states
+
+```{r, warning= False, comment= " "}
+
+ggplot(d2pbai,aes(prop_health_insurance,youth_pov_prop_est)) + geom_point( aes(col=State_abb)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb)) + theme(legend.position = "none")
+
+```
+
+The above scatter plot indicates that the youth poverty rate decreases as the proportion of the population who has health insurance coverage increases. It also shows that the colder climate states have a higher proportion of the population with health insurance coverage and with a lower youth poverty rate. 
+
+
 * **find another** (chris)
 
 ```{r, fig.width = 12, fig.height = 2}
