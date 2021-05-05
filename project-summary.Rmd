@@ -5,19 +5,17 @@ author: "Bai Jaitrong, Christopher Graham, David Palcsak"
 output: html_document
 ---
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE}
 #read the data from github and pull in libraries
 
 library(ggplot2)
 library(readr)
+library(dplyr)
 
 d2p1 <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/d2p1.csv"))
 food <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/foodaccess3.csv"))
 eth <- read_csv(url("https://raw.githubusercontent.com/chrisgraham631/D2P/main/national_ethnicity_histogram_data.csv"))
-
-#data manipulation used by Bai, changing crime variable to crime rate per 100K
-
-d2pbai <- d2p1 %>% mutate(prop_health_insurance = health_insurance/total_pop*100, prop_educ_bach = educ_bach/total_pop*100, violent_crime_per_100K = violent_crime/population *100000, homicide_per_100K = homicide/population*100000, raped_revised_per_100K = rape_revised/population*100000, robbery_per_100K = robbery/population *100000, aggravated_assault_per_100K = aggravated_assault/population *100000, property_crime_per_100K = property_crime/population *100000, burgulary_per_100K = burglary/population *100000, larceny_per_100K = larceny/population*100000, motor_vehicle_theft_per_100K = motor_vehicle_theft/population *100000) %>% select(State_abb, youth_pov_prop_est,unemployment, prop_health_insurance,prop_educ_bach,elem_size,second_size,salary, prop_latino_youth_pov,prop_asian_youth_pov,prop_black_youth_pov, prop_american_indian_youth_pov, prop_white_youth_pov, prop_other_youth_pov,violent_crime_per_100K,homicide_per_100K,raped_revised_per_100K, robbery_per_100K,aggravated_assault_per_100K,property_crime_per_100K,burgulary_per_100K,larceny_per_100K,motor_vehicle_theft_per_100K)
+colData <- read_csv('https://raw.githubusercontent.com/chrisgraham631/D2P/main/D2P_county_data.csv')
 
 ```
 
@@ -27,50 +25,61 @@ In 2017 the United States ranked 6th in GDP per capita among the 36 countries in
 
 Our objective was to explore what socioeconomic factors have an effect on childhood poverty in the United States and suggest policy changes that can be made in Colorado to help reduce our state's poverty rate and break the cycle?
 
-We collected data from various federal, state, and non-profit agencies such as HUD and the Annie E. Casey Foundation’s website *The Kids Count Data Center*. Our final data set consisted of 51 observations and 50 variables related to poverty, unemployment, health insurance coverage, education, crime rate, food access, and ethnicity for each of the states and DC.
+We collected data from various federal, state, and non-profit agencies such as HUD and the Annie E. Casey Foundation’s website *The Kids Count Data Center*.  Our final data set consisted of 51 observations and 50 variables related to poverty, unemployment, health insurance coverage, education, crime rate, food access, and ethnicity for each of the states and DC.
 
-Using exploratory data analysis, we determined which variables had a linear relationship with youth poverty. We further narrowed down the variables by using linear regression analysis to determine which of the 50 variables were the most influential in predicting youth poverty rates in our multiple regression model. 
+Using exploratory data analysis, we determined which variables had a linear relationship with youth poverty.  We further narrowed down the variables by using linear regression analysis to determine which of the 50 variables were the most influential in predicting youth poverty rates in our multiple regression model. 
+We tested our model assumptions of homoscedasticity, linearity, normality, no multicollinearity, and no autocorrelation using a combination of formal testing and visual inspection of scatter plots.  For example, We use the Durbin-Watson test to confirm that there were no autocorrelation in the model.  We removed any variables with a variance inflation factor (VIF) greater than 5 to minimize any multicollinearity in the model.  We also remove any variables with a p-value great greater than.05.  This produced a model with 3 explanatory variables, prop_health_insurance, percent_latino_youth_pov, and percent_black_youth_pov.
 
-We tested our model assumptions of homoscedasticity, linearity, normality, no multicollinearity, and no autocorrelation using a combination of formal testing and visual inspection of scatter plots. For example, We use the Durbin-Watson test to confirm that there were no autocorrelation in the model. We removed any variables with a variance inflation factor (VIF) greater than 5 to minimize any multicollinearity in the model. We also remove any variables with a p-value great greater than.05. This produced a model with 3 explanatory variables, prop_health_insurance, percent_latino_youth_pov, and percent_black_youth_pov.
-
-# Data cleaning
+# Data Cleaning
 
 The data cleaning process never really ended.  Initially everyone collected relevant data and a large data table was created with most of the variables we used.  As the analysis continued, we had to add a few additional variables.  The main dataset used broke down the data by state, but additional data was analyzed at the both the national level and the Colorado county level.  
 
 The initial data cleaning required using many techniques learned in the Module 4 and a few that were found on the internet.  Common functions like select, filter and rename were used frequently.  The mutate function was used multiple times.  Mostly it was used to create either a proportion of a variable from a total population or to create a population estimate based on a proportion.  One of the datasets had the individual states broken down by something called a CoC number.  This required us to the separate function to separate the state abbreviation from the CoC number.  This left us with multiple rows for each state and a few extra rows with numeric data.  After doing some digging, we found the aggregate function, which allowed us to combine the various rows for each state by summing the numeric data.  Once the various data tables were clean and named correctly, the merge function was used to combine the data into one table.  It was then written as a .csv.
 
-# Numeric summaries
+# Numeric Summaries
 
-Provide a numeric summary of the response and at least 3 other variables along with a brief interpretation of each summary.
-
-#Youth Poverty Rate 
+## Youth Poverty Rate
 
 ```{r}
-
 summary(d2p1$youth_pov_prop_est)
-sd(d2p1$youth_pov_prop_est)
-sd(d2p1$youth_pov_prop_est)/15.93
-
+sprintf("Standard Deviation: %f", sd(d2p1$youth_pov_prop_est))
+sprintf("Standard Deviation/Mean: %f", sd(d2p1$youth_pov_prop_est)/15.93)
 ```
 
-The median and mean of the youth poverty  rate are 15.50% and 15.93% respectively. The mean is larger than the median indicating that the data is skewed to the right. The lowest youth poverty rate is at 8.10% and the highest poverty rate is at 27.60 %. Based on the ratio of the standard deviation and mean being approximately 27%, the spread of the data would be considered low.
+The median and mean of the youth poverty rate are 15.50% and 15.93% respectively.  The mean is larger than the median indicating that the data is skewed to the right.  The lowest youth poverty rate is at 8.10% and the highest poverty rate is at 27.60%.  Based on the ratio of the standard deviation and mean being approximately 27%, the spread of the data would be considered low.
 
-#Proportion of the population who has Health Insurance Coverage 
+## Proportion of the Population With Health Insurance 
 ```{r}
-
 summary(d2p1$prop_health_insurance)
-sd(d2p1$prop_health_insurance)
-sd(d2p1$prop_health_insurance)/89.17
-
+sprintf("Standard Deviation: %f", sd(d2p1$prop_health_insurance))
+sprintf("Standard Deviation/Mean: %f", sd(d2p1$prop_health_insurance)/89.17)
 ```
 
-The median and mean of the proportion of the population who has health insurance coverage is 89.45% and 89.17%. The mean is smaller than the median indicting that the data is skewed to the left. The lowest proportion of the population who has health insurance coverage is 80.75% and the highest is 96.75%. Based on the ratio of the standard deviation and mean being approximately 3.8%, the spread of the data would be considered low. 
+The median and mean of the proportion of the population who have health insurance coverage is 89.45% and 89.17%.  The mean is smaller than the median indicting that the data is skewed to the left.  The lowest proportion of the population who has health insurance coverage is 80.75% and the highest is 96.75%.  Based on the ratio of the standard deviation and mean being approximately 3.8%, the spread of the data would be considered low. 
 
-* summarize Latino and Black (Chris)
+## Proportion of Black Youth in Poverty
 
-# Univariate graphics
+```{r}
+summary(d2p1$prop_black_youth_pov, na.rm = TRUE)
+sprintf("Standard Deviation: %f", sd(d2p1$prop_black_youth_pov, na.rm = TRUE))
+sprintf("Standard Deviation/Mean: %f", sd(d2p1$prop_black_youth_pov, na.rm = TRUE)/mean(d2p1$prop_black_youth_pov, na.rm = TRUE))
+#ggplot(d2p1) + geom_histogram(aes(x=prop_black_youth_pov))
+```
 
-### Response Variable:
+The mean, at 0.33, is slightly smaller than the median, 0.35, of the distribution of Black youth in poverty.  This indicates that the data is slightly skewed to the left. The minimum of Black youth in the United States is 0.17 (Colorado) and the maximum of the statistic is 0.47 (Louisiana).  The standard deviation of the distribution accounts for 21.7% of the mean.
+
+## Proportion of Latino Youth in Poverty
+```{r}
+summary(d2p1$prop_latino_youth_pov, na.rm = TRUE)
+sprintf("Standard Deviation: %f", sd(d2p1$prop_latino_youth_pov, na.rm = TRUE))
+sprintf("Standard Deviation: %f", sd(d2p1$prop_latino_youth_pov, na.rm = TRUE)/mean(d2p1$prop_latino_youth_pov, na.rm = TRUE))
+```
+
+The mean, at 0.22, is slightly smaller than the median, 0.27, of the distribution of Latino youth in poverty.  This indicates that the data is slightly skewed to the left. The minimum of Latino youth in the United States is 0.11 (Arkansas) and the maximum of the statistic is 0.40 (Alabama).  The standard deviation of the distribution accounts for 23.6% of the mean.
+
+# Univariate Graphics
+
+## Response Variable:
 ```{r message=FALSE}
 ggplot(d2p1, aes(x=youth_pov_prop_est)) + geom_histogram() + geom_vline(aes(xintercept=d2p1$youth_pov_prop_est[d2p1$State_abb=='CO'], color="red", linetype = "dashed")) +
 geom_text(aes(x=d2p1$youth_pov_prop_est[d2p1$State_abb=='CO'], y=4.5, label = "Colorado\n", angle = 90, color = "red")) +
@@ -82,7 +91,7 @@ ylab("Count")
 
 Colorado had a youth poverty rate of 11.2% in our dataset.  From the graphic above we can conclude that Colorado is considerably low in its youth poverty rate compared to other states.  In fact, Colorado is in the 6th percentile and 6th overall in the United States. 
 
-### Predictor Variables:
+## Predictor Variables:
 ```{r}
 #I wanted the violin plot of the entire United States but this plot was requiring a y aesthetic.  CPI is the same for all 50 states so it was chosen for the y aesthetic.
 ggplot(d2p1) + geom_violin(aes(x = prop_latino_youth_pov, y = cpi)) + geom_boxplot(aes(x = prop_latino_youth_pov, y = cpi), width = 0.1) + xlab("x") + ylab("y") + labs(title = "Proportion of Latino youth living in poverty") +
@@ -91,7 +100,6 @@ theme_bw()
 
 The graphic above has a violin plot with a small boxplot on top.  This gives us information about the distribution of the data.  The boxplot shows the Q1, median and Q3 values, while the violin plot shows the density of the data.  The violin plot would also show if the data is multimodal.  It appears as if the mode is around 0.24 but a small second mode may be around 0.34.  From this we can see that 50% of states have less than 25.5% of their Latino youth population in poverty and 75% of the states have less than 33% of their Latino youth population living in poverty.  It also shows a maximum value of 40% of Latino youth living in poverty and a minimum value of around 11%.
 
-
 ```{r}
 ggplot(d2p1) + geom_violin(aes(x = prop_black_youth_pov, y = cpi)) + geom_boxplot(aes(x = prop_black_youth_pov, y = cpi), width = 0.1) + xlab("x") + ylab("y") + labs(title = "Proportion of Black youth living in poverty") +
 theme_bw() 
@@ -99,18 +107,13 @@ theme_bw()
 
 The graphic above has a violin plot with a small boxplot on top.  This gives us information about the distribution of the data.  The boxplot shows the Q1, median and Q3 values, while the violin plot shows the density of the data.  The violin plot would also show if the data is multimodal.  The mode of this dataset appears to be around 0.38 with a potential smaller second mode around 0.27.  The boxplot shows that 25% of states have less than 27% of their black youth population living in poverty while 50% of states have less than 35% of their black youth living in poverty.  For this plot the maximum percentage of black youth living in poverty is around 47% and the minimum is around 17%.  The state with the lowest proportion of black youth living in poverty is still at nearly 20%, thats way too high.
 
-* box plot health insurance
-
 ```{r}
-
-ggplot(d2p1,aes(, y= prop_health_insurance)) + geom_boxplot() 
-
-
+ggplot(d2p1,aes(y= prop_health_insurance)) + geom_boxplot() + ylab("Percentage of Population With Health Insurance")
 ```
 
-The median is close to 90% of the population having health insurance coverage. With the median being towards the top of the box plot, the data is left skewed. The minimum is close to 80% and the maximum is close to 96% and the spread looks to be low. There are also no outliers.
+The median is close to 90% of the population having health insurance coverage.  With the median being towards the top of the box plot, the data is left skewed. The minimum is close to 80% and the maximum is close to 96% and the spread looks to be low. There are also no outliers.
 
-# Bivariate graphics
+# Bivariate Graphics
 
 ```{r}
 #proportion of youth in poverty vs crime rate
@@ -122,47 +125,57 @@ ggplot(d2p1, aes(y = youth_pov_prop_est, x = violent_crime_per_100K)) +
   xlab("Violent Crimes per 100,000 People") +
 theme_bw() 
 ```
+
 This is a scatter plot of the percentage of youth in poverty vs violent crimes per 100,000 people.  The trend line shows a positive linear relationship which indicates that as one rate rises, so does the other.  The slope of the line is less than one indicating the violent crime rate increases at a faster rate than the percentage of youth in poverty does.  The data points fall near the line so the relationship likely exists, however, there is still a fair amount of variance indicating this may not be the strongest relationship.
 
-*Provide bivariate graphical summaries of the response versus at least 3 other variables along with a brief interpretation of each graphic.*
+```{r, echo=FALSE}
+colData <- colData %>% mutate(counties = tolower(counties))
+us_states = map_data("state")
+us_counties = map_data("county")
 
-* state map showing youth poverty rates (chris)
+col = subset(us_states, us_states$region == "colorado")
+colCounties =subset(us_counties, us_counties$region == "colorado")
 
-* youth poverty vs food access scatter plot (Bai)
+#merge the counties and colorado stats
+colCounties <- merge(colCounties, colData, by.x = "subregion", by.y = "counties")
+
+ggplot(colCounties) + 
+  geom_polygon(aes(x = long, y = lat, group = group, fill = child_pov_prop_2016*100), 
+               color = "black") + xlab('Longitude') + ylab('Latitude')+
+     scale_fill_continuous(name = "Youth Poverty Rate",
+                           low = "lightblue",
+                           high = "darkred",
+                           limits = c(7,40)) +
+    theme_bw() 
+```
+
+While Colorado's youth poverty rate is 11.2%, there is a disparity in the distribution of the youth poverty rate amongst the Counties within the State.  Counties such as Douglas and Broomfield have child poverty rates below 5% while Costilla and Crowley Counties are near a 40% poverty rates.  The above graphic depicts how this distribution appears geographically.  Many of the most affected communities, with regards to youth poverty rates, are in the southern portion of the State, while the least affected areas are predominantly around the central and northern portion of the State.
 
 ```{r, echo=FALSE}
-
-food <-  food %>% %>% mutate(perc_weighted_mean_lakids1share = weighted_mean_lakids1share*100, youth_pov_rate = youth_poverty_rate_2010*100) 
-
+food <-  food %>%  mutate(perc_weighted_mean_lakids1share = weighted_mean_lakids1share*100, youth_pov_rate = youth_poverty_rate_2010*100) 
 ggplot(food,aes(x = perc_weighted_mean_lakids1share, y = youth_pov_rate)) + 
   geom_smooth(method = lm,se = FALSE) +
   xlab("Percentage of youth living in low food access areas") + 
   ylab("2010 Youth Poverty Rate")
+```
 
+The scatter plot of the 2010 youth poverty rate vs percentage of youth living in low food access areas shows that there is a strong positive relationship between the two variables.  As the percentage of youth living in low food access areas increases, youth poverty rate increases. 
+
+# Multivariate Graphics
+
+Provide at least 3 multivariate graphical summaries along with a brief interpretation of each graphic.  This could be something like a scatter plot of the response versus another variable that facets by a third variable (or uses colors or shapes to distinguish levels of another variable).
+
+```{r, warning= FALSE, comment= " "}
+ggplot(d2p1,aes(prop_health_insurance,youth_pov_prop_est)) + geom_point( aes(col=State_abb)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb)) + theme(legend.position = "none") + xlab("Percentage of the Population With Health Insurance") + ylab("Youth Poverty Rate")
+```
+
+The above scatter plot indicates that the youth poverty rate decreases as the proportion of the population who has health insurance coverage increases.  It also shows that the colder climate states have a higher proportion of the population with health insurance coverage and with a lower youth poverty rate. 
+
+```{r}
 
 ```
 
-The scatter plot of the 2010 youth poverty rate vs percentage of youth living in low food access areas shows that there is a strong positive relationship between the two variables. As the percentage of youth living in low food access areas increases, youth poverty rate increases. 
-
-# Multivariate graphics
-
-Provide at least 3 multivariate graphical summaries along with a brief interpretation of each graphic. This could be something like a scatter plot of the response versus another variable that facets by a third variable (or uses colors or shapes to distinguish levels of another variable).
-
-* bar chart showing ethnicity, total, and poverty.
-
-
-# scatter plot showing health insurance vs. youth poverty vs. states
-
-```{r, warning= False, comment= " "}
-
-ggplot(d2p1,aes(prop_health_insurance,youth_pov_prop_est)) + geom_point( aes(col=State_abb)) + geom_smooth(method = lm, se= FALSE) + geom_text(aes(label = State_abb)) + theme(legend.position = "none")
-
-```
-
-The above scatter plot indicates that the youth poverty rate decreases as the proportion of the population who has health insurance coverage increases. It also shows that the colder climate states have a higher proportion of the population with health insurance coverage and with a lower youth poverty rate. 
-
-
-* **find another** (chris)
+stuff
 
 ```{r, fig.width = 12, fig.height = 2}
 ggplot(eth, aes(fill = Ethnicity, x = Type, y = Proportion)) + 
@@ -171,34 +184,38 @@ ggplot(eth, aes(fill = Ethnicity, x = Type, y = Proportion)) +
   coord_flip() +
 theme_bw() 
 ```
+
 The graphic above shows the ethnic breakdown of the total population of children in the United States of America and the ethnic breakdown of children who live in poverty in the USA.  If ethnicity had no effect on children living in poverty, then we would expect each ethnic group to have the same representation in both bars.  While the graphic does not allow for quantitative analysis, it does show whether youth in certain ethnic groups are more or less likely to be exposed to poverty.  The bar representing the 'Non-Hispanic White' group represents a significantly bigger portion of the total childhood population than it does the population of children in poverty which indicates that children in the 'Non-Hispanic White' ethnic group are less likely to be exposed to poverty.  Children in the 'Asian and Pacific Islander' group are less likely to be exposed to poverty by the same observation.  This graphic also shows that children in the 'Hispanic or Latino', 'Black or African American' and 'American Indian' ethnic groups are more likely to be exposed to poverty because they represent a larger portion of the population of children in poverty than the total population of children.
 
-
-# Mutiple Regression Model 
+# Multiple Regression Model 
 
 ```{r, comment= "", echo=FALSE}
  
-
-poverty_model2 <- lm(youth_pov_prop_est ~ prop_health_insurance + prop_latino_youth_pov + prop_black_youth_pov, data= d2p1) 
-
+poverty_model2 <- lm(youth_pov_prop_est ~ prop_health_insurance + percent_latino_youth_pov + percent_black_youth_pov, data= d2p1) 
 summary(poverty_model2)
+car::vif(poverty_model2)
+(mfrow=c(2,2))
+plot(poverty_model2)
+par(mfrow=c(1,1))
+#View(d2p1)
+```
 
+# Homoscedasticity and Autocorrelation Test
+
+```{r}
+#testing for homoscedasticty/constant variance, null hypothesis is homoscedasticity. if p-value is less than .05, then the null hypothesis can be rejected.
+library(lmtest)
+bptest(poverty_model2)
+#testing for autocorrellation, null hypothesis is the errors( residuals are independent) are uncorrelated
+dwtest(poverty_model2)
 
 ```
 
-The summary of the model confirms that all three explanatory variables are statistically significant with their p-values being under .05. The adjusted R-squared indicates that the model explains approximately 73% of the variability. The overall p-value, 1.1689e-08, for the model under the F-statistic confirms that it does a better job in predicting youth poverty than a model using just the average poverty rate. 
+# Conclusions and Recommendations
 
-Holding the other two variables constant, the coefficient for prop_health_insurance indicates that for a 1% increase in the proportion of the population who has health insurance coverage there is a decrease in youth poverty by .50%. In contrast, for a 1% increase in the Latino and black youth poverty rate there is an increase in the overall youth poverty rate by .29% and .16% respectively. 
+In conclusion, although Colorado ranks well in statewide youth poverty rate compared to the rest of the Unite States, one in ten children still fall below the poverty line.  Yet, it has long been a challenge to determine what factors are both influential and targetable for some type of policy change in regards to youth poverty rates. Our model contained three powerful predictors for youth poverty rate.  The percentage of a State's population that is covered by some form of health insurance explains more of the variance in a State's youth poverty rate than the other two predictors, as such it is the best key to bringing down youth poverty.  More precisely, holding the percentage of Latino and Black youth in poverty constant, a 1% increase in health insurance coverage returns a 0.5% decrease in youth poverty.  This implies that if 100% of the population of Colorado is covered with health insurance, our model estimates that the State’s youth poverty rate will decline from 11% to 5%. 
 
-
-
-
-
-# Conclusions and recommendations
-
-In conclusion, although Colorado ranks well in statewide youth poverty rate compared to the rest of the Unite States, one in ten children still fall below the poverty line. Yet, it has long been a challenge to determine what factors are both influential and targetable for some type of policy change in regards to youth poverty rates. Our model contained three powerful predictors for youth poverty rate. The percentage of a State's population that is covered by some form of health insurance explains more of the variance in a State's youth poverty rate than the other two predictors, as such it is the best key to bringing down youth poverty. More precisely, holding the percentage of Latino and Black youth in poverty constant, a 1% increase in health insurance coverage returns a 0.5% decrease in youth poverty. This implies that if 100% of the population of Colorado is covered with health insurance, our model estimates that the State’s youth poverty rate will decline from 11% to 5%. 
-
-Based on our analysis, our policy recommendation is two-fold. First, Government funded assistance programs play a major role in reducing poverty, specifically for Black and Latino children. Studies have shown that increasing Earned Income Tax credits by 40% can decrease youth poverty by 16% nation-wide. The Supplemental Nutrition Assistance Program was expanded in 2010 and one study showed a decrease in youth poverty of 16.2%. Black and Hispanic workers are about twice as likely to work for poverty wages so raising the minimum wage would help target the highest risk minority groups according to our model. In general, the more funding we can give government assistance programs, the less youth we would expect to see in poverty. Our second recommendation is to pass some form of universal health care. According to our model, this is the best thing we can do to reduce childhood poverty. Ideally, we would pass this on a national level. A recent survey from the Pew Research Center showed that 62% of Americans now favor a single payer health care system. The biggest public barrier is agreeing on the system. The biggest political barriers remaining are dealing with the influence the health insurance companies currently have on policy and figuring out how to pay for it. Estimates vary widely on how much this might cost but the range seems be \$1.4 trillion per year and \$2.8 trillion per year. Currently the United States spends \$1.4 on social health programs, so the additional cost to taxpayers would be between \$0 and \$1.4 trillion per year. Universal health care would have a wide-spread effect on Americans and there are more factors to consider than the number of youth living in poverty, but this should be an important part of the decision.
+Based on our analysis, our policy recommendation is two-fold.  First, Government funded assistance programs play a major role in reducing poverty, specifically for Black and Latino children. Studies have shown that increasing Earned Income Tax credits by 40% can decrease youth poverty by 16% nation-wide.  The Supplemental Nutrition Assistance Program was expanded in 2010 and one study showed a decrease in youth poverty of 16.2%. Black and Hispanic workers are about twice as likely to work for poverty wages so raising the minimum wage would help target the highest risk minority groups according to our model.  In general, the more funding we can give government assistance programs, the less youth we would expect to see in poverty.  Our second recommendation is to pass some form of universal health care.  According to our model, this is the best thing we can do to reduce childhood poverty.  Ideally, we would pass this on a national level.  A recent survey from the Pew Research Center showed that 62% of Americans now favor a single payer health care system.  The biggest public barrier is agreeing on the system. The biggest political barriers remaining are dealing with the influence the health insurance companies currently have on policy and figuring out how to pay for it.  Estimates vary widely on how much this might cost but the range seems be \$1.4 trillion per year and \$2.8 trillion per year.  Currently the United States spends \$1.4 on social health programs, so the additional cost to taxpayers would be between \$0 and \$1.4 trillion per year.  Universal health care would have a wide-spread effect on Americans and there are more factors to consider than the number of youth living in poverty, but this should be an important part of the decision.
 
 # Appendix
 
@@ -334,42 +351,6 @@ final_data <- merge(x = pov_data, y = var_data, by = "State_abb")
 ```{r, eval = FALSE}
 #writing the file
 write.csv(final_data, "C:/Users/dpalc/OneDrive/Documents/School/DataWrangling/D2P_project/D2P_poverty_dataset.csv")
-```
-
-
-```{r, comment= "", echo=FALSE, eval = FALSE}
-# used a modified version of forward and backward selection, instead of using the p value to remove the variables, used VIF value to determine what variable to remove
-
-# Assumption test:
-# linearity- view residuals vs Fitted, roughly linear base on scatter plot( red line roughly horizontal and no obvious pattern on the plot)
-# normality- view Q-Q plot, points roughly aligned with the diagonal line
-# no multicollinearity verified with Variance Inflation factor (VIF less than 5)), 
-# No autocorrelation confirmed with the Durbin Watson Test
-# homoscedasticity confirmed with bp ( Breusch - Pagan )test 
-
-summary(poverty_model2)
-
-car::vif(poverty_model2)
-
-#Residual scatter plots 
-
-(mfrow=c(2,2))
-plot(poverty_model2)
-par(mfrow=c(1,1))
-
-
-```
-
-```{r, eval = FALSE}
-#testing for homoscedasticty/constant variance, null hypothesis is homoscedasticity. if p-value is less than .05, then the null hypothesis can be rejected.
-library(lmtest)
-bptest(poverty_model2)
-
-#testing for autocorrellation, null hypothesis is the errors( residuals are independent) are uncorrelated
-
-dwtest(poverty_model2)
-
-
 ```
 
 **This is the end of the initial data cleanup**
